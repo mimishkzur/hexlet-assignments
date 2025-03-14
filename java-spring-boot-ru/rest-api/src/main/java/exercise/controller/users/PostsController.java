@@ -1,6 +1,5 @@
 package exercise.controller.users;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,22 +24,23 @@ public class PostsController {
     private List<Post> posts = Data.getPosts();
 
     @GetMapping("/users/{id}/posts")
-    public Optional<Post> show(@PathVariable String id) {
+    public List<Post> show(@PathVariable Integer id) {
 
         var post = posts.stream()
                 .filter(p -> p.getUserId().equals(id))
-                .findAll();
+                .toList();
         return post;
     }
 
     @PostMapping("/users/{id}/posts")
-    public ResponseEntity<Post> create(@RequestBody Post post) {
+    public ResponseEntity<Post> create(@PathVariable Integer id, @RequestBody Post post) {
+        post.setUserId(id);
         posts.add(post);
 
-        URI location = ServletUriComponentsBuilder
+        var location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(post.getUserId())
+                .buildAndExpand(post.getSlug())
                 .toUri();
 
         return ResponseEntity.created(location).body(post);
