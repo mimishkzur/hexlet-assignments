@@ -21,26 +21,18 @@ public class PostsController {
     private List<Post> posts = Data.getPosts();
 
     @GetMapping("/users/{id}/posts")
-    public List<Post> show(@PathVariable Integer id) {
-
-        var post = posts.stream()
+    public List<Post> index(@PathVariable Integer id) {
+        return posts.stream()
                 .filter(p -> p.getUserId() == id)
                 .toList();
-        return post;
     }
 
     @PostMapping("/users/{id}/posts")
-    public ResponseEntity<Post> create(@PathVariable Integer id, @RequestBody Post post) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Post create(@PathVariable Integer id, @RequestBody Post post) {
         post.setUserId(id);
         posts.add(post);
-
-        var location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(post.getSlug())
-                .toUri();
-
-        return ResponseEntity.created(location).body(post);
+        return post;
     }
 }
 // END
